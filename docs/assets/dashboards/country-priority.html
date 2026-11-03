@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>手游市场分析看板</title>
+</head>
+<body>
+<div id="mobile-game-dashboard" class="mgd-root">
+  <style>
+    #mobile-game-dashboard {
+      --ink: #17202a;
+      --muted: #64717f;
+      --panel: #ffffff;
+      --line: #d9e0e7;
+      --soft: #f7f4ed;
+      --discoverer: #98a5ad;
+      --emerging: #6ba894;
+      --transitioner: #d6b64b;
+      --advanced: #c77d7d;
+      --leader: #857cba;
+      --accent: #176f86;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, #fbfaf6 0%, #f1f5f7 100%);
+      min-height: 100vh;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+    #mobile-game-dashboard * { box-sizing: border-box; }
+    #mobile-game-dashboard .shell { max-width: 1240px; margin: 0 auto; }
+    #mobile-game-dashboard .tab-shell { max-width: 1240px; margin: 0 auto 18px; }
+    #mobile-game-dashboard .tabs { display: flex; gap: 8px; align-items: center; border-bottom: 1px solid var(--line); }
+    #mobile-game-dashboard .tab-button { appearance: none; border: 1px solid transparent; border-bottom: 0; background: transparent; color: var(--muted); cursor: pointer; font: inherit; font-size: 14px; font-weight: 720; padding: 12px 16px; min-height: 44px; }
+    #mobile-game-dashboard .tab-button[aria-selected="true"] { background: rgba(255,255,255,.86); border-color: var(--line); color: var(--ink); }
+    #mobile-game-dashboard .tab-panel { display: none; }
+    #mobile-game-dashboard .tab-panel.active { display: block; }
+    #mobile-game-dashboard #tab3Panel { display: block; }
+    #mobile-game-dashboard #tab3Panel { display: block; }
+    #mobile-game-dashboard .tab2-frame { width: 100%; min-height: 1120px; border: 1px solid var(--line); background: #ffffff; display: block; }
+    #mobile-game-dashboard .topbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
+    body { margin: 0; }
+    #mobile-game-dashboard h1 { margin: 0; font-size: 36px; line-height: 1.08; letter-spacing: 0; font-weight: 760; }
+    #mobile-game-dashboard .subtitle { margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 1.45; max-width: 720px; }
+    #mobile-game-dashboard .source { color: var(--muted); font-size: 12px; text-align: right; white-space: nowrap; }
+    #mobile-game-dashboard .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 16px 0 18px; }
+    #mobile-game-dashboard .metric { background: rgba(255,255,255,.74); border: 1px solid var(--line); padding: 12px 14px; min-height: 72px; }
+    #mobile-game-dashboard .metric .label { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+    #mobile-game-dashboard .metric .value { font-size: 22px; font-weight: 740; }
+    #mobile-game-dashboard .layout { display: block; }
+    #mobile-game-dashboard .chart-wrap, #mobile-game-dashboard .detail { background: rgba(255,255,255,.82); border: 1px solid var(--line); }
+    #mobile-game-dashboard .chart-wrap { min-height: 500px; padding: 14px 16px 12px; position: relative; }
+    #mobile-game-dashboard .chart-head { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 4px; }
+    #mobile-game-dashboard .chart-title { font-size: 15px; font-weight: 700; }
+    #mobile-game-dashboard .legend { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px 14px; color: var(--muted); font-size: 12px; }
+    #mobile-game-dashboard .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+    #mobile-game-dashboard .swatch { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    #mobile-game-dashboard .svg-box { width: 100%; height: 440px; }
+    #mobile-game-dashboard svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    #mobile-game-dashboard .axis, #mobile-game-dashboard .axis-title, #mobile-game-dashboard .point-label { fill: var(--ink); font-size: 12px; }
+    #mobile-game-dashboard .axis { fill: #536170; }
+    #mobile-game-dashboard .grid { stroke: #e6ebef; shape-rendering: crispEdges; }
+    #mobile-game-dashboard .frame { fill: none; stroke: #b9c4ce; }
+    #mobile-game-dashboard .revenue-band { opacity: .62; }
+    #mobile-game-dashboard .band-separator { stroke: #cfd8df; stroke-width: 1; }
+    #mobile-game-dashboard .band-label { fill: #536170; font-size: 11px; }
+    #mobile-game-dashboard .point { cursor: pointer; stroke: rgba(255,255,255,.95); stroke-width: 1.6; opacity: .86; transition: opacity .15s ease; }
+    #mobile-game-dashboard .point:hover, #mobile-game-dashboard .point.active { opacity: 1; stroke: #111827; stroke-width: 2.2; }
+    #mobile-game-dashboard .point-label { paint-order: stroke; stroke: white; stroke-width: 4px; font-size: 11px; pointer-events: none; }
+    #mobile-game-dashboard .point-label.reference-label { fill: #b7c0c8; }
+    #mobile-game-dashboard .point.highlight-point { stroke: #17202a; stroke-width: 2.6; opacity: 1; }
+    #mobile-game-dashboard .point-label.highlight-label { fill: #c9342d; font-weight: 740; }
+    #mobile-game-dashboard .axis-break { stroke: #7d8a96; stroke-width: 1.4; }
+    #mobile-game-dashboard .axis-note { fill: #64717f; font-size: 11px; }
+    #mobile-game-dashboard .detail { padding: 12px; min-height: auto; margin-top: 16px; }
+    #mobile-game-dashboard .detail-kicker { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+    #mobile-game-dashboard .country-name { font-size: 28px; font-weight: 760; line-height: 1.1; margin-bottom: 4px; }
+    #mobile-game-dashboard .country-code { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+    #mobile-game-dashboard .stage-badge { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; margin-bottom: 18px; }
+    #mobile-game-dashboard .stage-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    #mobile-game-dashboard .detail-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+    #mobile-game-dashboard .field { border-top: 1px solid var(--line); padding-top: 10px; min-height: 58px; }
+    #mobile-game-dashboard .field.wide { grid-column: 1 / -1; }
+    #mobile-game-dashboard .field-label { color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+    #mobile-game-dashboard .field-value { font-size: 16px; font-weight: 690; line-height: 1.25; overflow-wrap: anywhere; }
+    #mobile-game-dashboard .hint { color: var(--muted); font-size: 12px; line-height: 1.45; margin-top: 18px; }
+    #mobile-game-dashboard .tab3-footnote { color: var(--muted); font-size: 12px; line-height: 1.5; margin: 14px 2px 0; }
+    #mobile-game-dashboard .tooltip { position: fixed; z-index: 20; pointer-events: none; background: #17202a; color: white; border: 1px solid rgba(255,255,255,.15); padding: 9px 10px; font-size: 12px; line-height: 1.35; min-width: 170px; box-shadow: 0 8px 28px rgba(23,32,42,.22); opacity: 0; transform: translate(-50%, calc(-100% - 14px)); }
+    #mobile-game-dashboard .tooltip strong { display: block; font-size: 13px; margin-bottom: 3px; }
+    @media (max-width: 900px) {
+      #mobile-game-dashboard { padding: 18px; }
+      #mobile-game-dashboard h1 { font-size: 30px; }
+      #mobile-game-dashboard .tabs { align-items: stretch; overflow-x: auto; }
+      #mobile-game-dashboard .tab-button { white-space: nowrap; }
+      #mobile-game-dashboard .topbar { align-items: flex-start; flex-direction: column; gap: 8px; }
+      #mobile-game-dashboard .source { text-align: left; white-space: normal; }
+      #mobile-game-dashboard .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #mobile-game-dashboard .chart-wrap, #mobile-game-dashboard .detail { min-height: auto; }
+      #mobile-game-dashboard .svg-box { height: 580px; }
+      #mobile-game-dashboard .chart-head { align-items: flex-start; flex-direction: column; }
+      #mobile-game-dashboard .legend { justify-content: flex-start; }
+      #mobile-game-dashboard .detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      #mobile-game-dashboard { padding: 12px; }
+      #mobile-game-dashboard h1 { font-size: 26px; }
+      #mobile-game-dashboard .metrics { grid-template-columns: 1fr; }
+      #mobile-game-dashboard .detail-grid { grid-template-columns: 1fr; }
+      #mobile-game-dashboard .svg-box { height: 500px; }
+    }
+  </style>
+
+  <section class="tab-panel" id="tab1Panel" role="tabpanel" aria-labelledby="tab3Button">
+  <div class="shell">
+    <div class="topbar">
+      <div>
+        <h1>2025 手游市场 Martix</h1>
+        <p class="subtitle">每个点代表一个国家/地区：横轴为游戏人均下载数，纵轴为收入/下载。点的颜色表示 Mobile Index 阶段；20 以后横轴压缩显示。</p>
+      </div>
+      <div class="source">Sheet1 · 2025 年 · 55 个国家/地区</div>
+    </div>
+    <div class="metrics" id="mgdMetrics"></div>
+    <div class="layout">
+      <section class="chart-wrap" aria-label="2025 年国家游戏人均下载与收入下载比散点图">
+        <div class="chart-head">
+          <div class="chart-title">2025 游戏人均下载数 × 收入/下载</div>
+          <div class="legend" id="mgdLegend"></div>
+        </div>
+        <div class="svg-box"><svg id="mgdChart" role="img" aria-label="Revenue per download by per capita game downloads"></svg></div>
+      </section>
+      <aside class="detail" id="mgdDetail" aria-live="polite"></aside>
+    </div>
+  </div>
+  </section>
+  <section class="tab-panel" id="tab2Panel" role="tabpanel" aria-labelledby="tab2Button">
+    <div class="shell">
+      <iframe class="tab2-frame" id="tab2Frame" title="Tab2 - 休闲游戏市场曲线" src="Tab2%20-%20%E4%BC%91%E9%97%B2%E6%B8%B8%E6%88%8F%E5%B8%82%E5%9C%BA%E6%9B%B2%E7%BA%BF.html"></iframe>
+    </div>
+  </section>
+  <section class="tab-panel active" id="tab3Panel" role="tabpanel" aria-labelledby="tab1Button">
+    <div class="shell">
+      <div class="topbar">
+        <div>
+          <h1>国家投放市场优先级</h1>
+          <p class="subtitle">每个点代表一个国家/地区：横轴为游戏人均下载数，纵轴为移动用户人均广告消耗。<br>点的颜色表示 Mobile Index 阶段，颜色越深表示移动生态越发达。</p>
+        </div>
+        <div class="source">Sheet1 · 2025 年 · 23 个国家/地区</div>
+      </div>
+      <section class="chart-wrap" aria-label="国家投放市场优先级散点图">
+        <div class="chart-head">
+          <div class="chart-title">2025 游戏人均下载数 × 移动用户人均广告消耗</div>
+          <div class="legend" id="tab3Legend"></div>
+        </div>
+        <div class="svg-box"><svg id="tab3Chart" role="img" aria-label="Average ad spending per mobile internet user by per capita game downloads"></svg></div>
+      </section>
+      <aside class="detail" id="tab3Detail" aria-live="polite"></aside>
+      <p class="tab3-footnote">移动用户人均广告消耗(USD)数据 来源为 Statista Market Insights - Average Ad Spending per Mobile Internet User in 2025</p>
+    </div>
+  </section>
+  <div class="tooltip" id="mgdTooltip"></div>
+  <div class="tooltip" id="tab3Tooltip"></div>
+  <script>
+  (function() {
+    const data = [{"year": 2025, "country": "德国", "code": "DE", "downloads": 690250659, "revenue": 2087246665, "revenuePerDownload": 3.023897, "downloadYoY": -0.120382, "revenueYoY": 0.078162, "perCapitaDownloads": 8.267366, "cluster": "Leader", "mobileIndex": 92.012557, "contentServices": 91.053884, "populationWan": 8349.1}, {"year": 2025, "country": "英国", "code": "GB", "downloads": 635711558, "revenue": 1824205922, "revenuePerDownload": 2.86955, "downloadYoY": -0.114672, "revenueYoY": 0.112271, "perCapitaDownloads": 9.14864, "cluster": "Leader", "mobileIndex": 91.407692, "contentServices": 93.267145, "populationWan": 6948.7}, {"year": 2025, "country": "美国", "code": "US", "downloads": 3598747167, "revenue": 18182356397, "revenuePerDownload": 5.052413, "downloadYoY": -0.095633, "revenueYoY": -0.004246, "perCapitaDownloads": 10.529272, "cluster": "Leader", "mobileIndex": 90.566845, "contentServices": 92.39408, "populationWan": 34178.5}, {"year": 2025, "country": "法国", "code": "FR", "downloads": 661356167, "revenue": 1116009079, "revenuePerDownload": 1.687455, "downloadYoY": -0.081718, "revenueYoY": 0.081167, "perCapitaDownloads": 9.623926, "cluster": "Leader", "mobileIndex": 89.588618, "contentServices": 88.449928, "populationWan": 6872.0}, {"year": 2025, "country": "日本", "code": "JP", "downloads": 607566506, "revenue": 7437413606, "revenuePerDownload": 12.241316, "downloadYoY": -0.041883, "revenueYoY": -0.054416, "perCapitaDownloads": 4.924871, "cluster": "Leader", "mobileIndex": 87.741081, "contentServices": 88.444763, "populationWan": 12336.7}, {"year": 2025, "country": "韩国", "code": "KR", "downloads": 426983040, "revenue": 3690610853, "revenuePerDownload": 8.64346, "downloadYoY": -0.124298, "revenueYoY": 0.010274, "perCapitaDownloads": 8.261256, "cluster": "Leader", "mobileIndex": 85.218841, "contentServices": 91.597329, "populationWan": 5168.5}, {"year": 2025, "country": "沙特阿拉伯", "code": "SA", "downloads": 594593544, "revenue": 317041953, "revenuePerDownload": 0.533208, "downloadYoY": -0.112344, "revenueYoY": 0.060168, "perCapitaDownloads": 16.081396, "cluster": "Leader", "mobileIndex": 84.750312, "contentServices": 74.553116, "populationWan": 3697.4}, {"year": 2025, "country": "马来西亚", "code": "MY", "downloads": 465273357, "revenue": 290879627, "revenuePerDownload": 0.62518, "downloadYoY": -0.086489, "revenueYoY": 0.096473, "perCapitaDownloads": 12.932163, "cluster": "Leader", "mobileIndex": 80.305284, "contentServices": 75.019815, "populationWan": 3597.8}, {"year": 2025, "country": "俄罗斯", "code": "RU", "downloads": 2074692896, "revenue": 190605436, "revenuePerDownload": 0.091872, "downloadYoY": -0.147483, "revenueYoY": 0.279106, "perCapitaDownloads": 14.456481, "cluster": "Leader", "mobileIndex": 80.159699, "contentServices": 82.125548, "populationWan": 14351.3}, {"year": 2025, "country": "越南", "code": "VN", "downloads": 1281035507, "revenue": 181343758, "revenuePerDownload": 0.14156, "downloadYoY": -0.18927, "revenueYoY": -0.000547, "perCapitaDownloads": 12.608741, "cluster": "Advanced", "mobileIndex": 79.454976, "contentServices": 79.105132, "populationWan": 10159.9}, {"year": 2025, "country": "泰国", "code": "TH", "downloads": 720419586, "revenue": 509721628, "revenuePerDownload": 0.707534, "downloadYoY": -0.162568, "revenueYoY": 0.139861, "perCapitaDownloads": 10.058916, "cluster": "Advanced", "mobileIndex": 78.572166, "contentServices": 72.116596, "populationWan": 7162.0}, {"year": 2025, "country": "土耳其", "code": "TR", "downloads": 1613628522, "revenue": 459396770, "revenuePerDownload": 0.284698, "downloadYoY": -0.090662, "revenueYoY": 0.249352, "perCapitaDownloads": 18.789559, "cluster": "Advanced", "mobileIndex": 77.892438, "contentServices": 83.165989, "populationWan": 8587.9}, {"year": 2025, "country": "巴西", "code": "BR", "downloads": 3319068553, "revenue": 433127582, "revenuePerDownload": 0.130497, "downloadYoY": -0.159759, "revenueYoY": 0.042857, "perCapitaDownloads": 15.596247, "cluster": "Advanced", "mobileIndex": 77.115911, "contentServices": 83.794419, "populationWan": 21281.2}, {"year": 2025, "country": "印度尼西亚", "code": "ID", "downloads": 3035506028, "revenue": 305106387, "revenuePerDownload": 0.100513, "downloadYoY": -0.075082, "revenueYoY": 0.043567, "perCapitaDownloads": 10.624021, "cluster": "Advanced", "mobileIndex": 76.319906, "contentServices": 70.453347, "populationWan": 28572.1}, {"year": 2025, "country": "墨西哥", "code": "MX", "downloads": 2013513794, "revenue": 519042775, "revenuePerDownload": 0.25778, "downloadYoY": -0.129188, "revenueYoY": 0.108909, "perCapitaDownloads": 15.26002, "cluster": "Advanced", "mobileIndex": 76.264806, "contentServices": 77.59772, "populationWan": 13194.7}, {"year": 2025, "country": "哥伦比亚", "code": "CO", "downloads": 679166116, "revenue": 50025721, "revenuePerDownload": 0.073658, "downloadYoY": -0.040718, "revenueYoY": 0.11648, "perCapitaDownloads": 12.712277, "cluster": "Advanced", "mobileIndex": 72.211027, "contentServices": 74.883836, "populationWan": 5342.6}, {"year": 2025, "country": "阿根廷", "code": "AR", "downloads": 717532667, "revenue": 62809065, "revenuePerDownload": 0.087535, "downloadYoY": -0.102596, "revenueYoY": 0.669184, "perCapitaDownloads": 15.649226, "cluster": "Advanced", "mobileIndex": 72.164958, "contentServices": 72.912237, "populationWan": 4585.1}, {"year": 2025, "country": "南非", "code": "ZA", "downloads": 488195356, "revenue": 99372171, "revenuePerDownload": 0.20355, "downloadYoY": 0.160504, "revenueYoY": 0.147799, "perCapitaDownloads": 7.540046, "cluster": "Advanced", "mobileIndex": 71.684863, "contentServices": 68.335517, "populationWan": 6474.7}, {"year": 2025, "country": "菲律宾", "code": "PH", "downloads": 1369475470, "revenue": 243955452, "revenuePerDownload": 0.178138, "downloadYoY": -0.136567, "revenueYoY": 0.005825, "perCapitaDownloads": 11.726266, "cluster": "Advanced", "mobileIndex": 71.538266, "contentServices": 65.2634, "populationWan": 11678.7}, {"year": 2025, "country": "多米尼加共和国", "code": "DO", "downloads": 179939742, "revenue": 18804019, "revenuePerDownload": 0.104502, "downloadYoY": -0.068927, "revenueYoY": -0.030137, "perCapitaDownloads": 15.619769, "cluster": "Advanced", "mobileIndex": 70.270037, "contentServices": 71.400385, "populationWan": 1152.0}, {"year": 2025, "country": "印度", "code": "IN", "downloads": 8146006418, "revenue": 272123057, "revenuePerDownload": 0.033406, "downloadYoY": -0.026637, "revenueYoY": 0.146058, "perCapitaDownloads": 5.564721, "cluster": "Advanced", "mobileIndex": 69.157764, "contentServices": 67.159675, "populationWan": 146386.6}, {"year": 2025, "country": "厄瓜多尔", "code": "EC", "downloads": 262521737, "revenue": 19089289, "revenuePerDownload": 0.072715, "downloadYoY": -0.128812, "revenueYoY": 0.030884, "perCapitaDownloads": 14.353293, "cluster": "Advanced", "mobileIndex": 68.816433, "contentServices": 76.820714, "populationWan": 1829.0}, {"year": 2025, "country": "乌兹别克斯坦", "code": "UZ", "downloads": 500391157, "revenue": 10608637, "revenuePerDownload": 0.021201, "downloadYoY": -0.00452, "revenueYoY": 0.053512, "perCapitaDownloads": 13.504741, "cluster": "Advanced", "mobileIndex": 67.787297, "contentServices": 60.018773, "populationWan": 3705.3}, {"year": 2025, "country": "利比亚", "code": "LY", "downloads": 136904925, "revenue": 1475919, "revenuePerDownload": 0.010781, "downloadYoY": 0.157749, "revenueYoY": 1.179102, "perCapitaDownloads": 18.354327, "cluster": "Advanced", "mobileIndex": 67.094336, "contentServices": 57.204778, "populationWan": 745.9}, {"year": 2025, "country": "黎巴嫩", "code": "LB", "downloads": 119791230, "revenue": 7451901, "revenuePerDownload": 0.062207, "downloadYoY": -0.141234, "revenueYoY": 0.102943, "perCapitaDownloads": 20.480634, "cluster": "Advanced", "mobileIndex": 66.702511, "contentServices": 55.099122, "populationWan": 584.9}, {"year": 2025, "country": "突尼斯", "code": "TN", "downloads": 140917584, "revenue": 951081, "revenuePerDownload": 0.006749, "downloadYoY": -0.035168, "revenueYoY": -0.058722, "perCapitaDownloads": 11.411255, "cluster": "Advanced", "mobileIndex": 66.640212, "contentServices": 68.654261, "populationWan": 1234.9}, {"year": 2025, "country": "约旦", "code": "JO", "downloads": 195602710, "revenue": 18890486, "revenuePerDownload": 0.096576, "downloadYoY": 0.078605, "revenueYoY": -0.047632, "perCapitaDownloads": 16.977928, "cluster": "Advanced", "mobileIndex": 66.184607, "contentServices": 64.806013, "populationWan": 1152.1}, {"year": 2025, "country": "埃及", "code": "EG", "downloads": 939192458, "revenue": 24759858, "revenuePerDownload": 0.026363, "downloadYoY": -0.063214, "revenueYoY": 0.0081, "perCapitaDownloads": 7.934647, "cluster": "Advanced", "mobileIndex": 65.853311, "contentServices": 60.025698, "populationWan": 11836.6}, {"year": 2025, "country": "摩洛哥", "code": "MA", "downloads": 455124190, "revenue": 9704306, "revenuePerDownload": 0.021322, "downloadYoY": 0.132936, "revenueYoY": 0.086181, "perCapitaDownloads": 11.842632, "cluster": "Advanced", "mobileIndex": 65.252374, "contentServices": 61.050701, "populationWan": 3843.1}, {"year": 2025, "country": "斯里兰卡", "code": "LK", "downloads": 102366881, "revenue": 4942200, "revenuePerDownload": 0.048279, "downloadYoY": 0.049237, "revenueYoY": 0.310006, "perCapitaDownloads": 4.705225, "cluster": "Transitioner", "mobileIndex": 64.020072, "contentServices": 61.292198, "populationWan": 2175.6}, {"year": 2025, "country": "玻利维亚", "code": "BO", "downloads": 150862872, "revenue": 5029206, "revenuePerDownload": 0.033336, "downloadYoY": -0.086788, "revenueYoY": -0.154374, "perCapitaDownloads": 11.990373, "cluster": "Transitioner", "mobileIndex": 62.162344, "contentServices": 60.403038, "populationWan": 1258.2}, {"year": 2025, "country": "柬埔寨", "code": "KH", "downloads": 172478907, "revenue": 13730126, "revenuePerDownload": 0.079605, "downloadYoY": -0.118163, "revenueYoY": 0.088079, "perCapitaDownloads": 9.663767, "cluster": "Transitioner", "mobileIndex": 61.72417, "contentServices": 54.313895, "populationWan": 1784.8}, {"year": 2025, "country": "委内瑞拉", "code": "VE", "downloads": 447994082, "revenue": 3098510, "revenuePerDownload": 0.006916, "downloadYoY": 0.018703, "revenueYoY": -0.108482, "perCapitaDownloads": 15.70972, "cluster": "Transitioner", "mobileIndex": 59.78825, "contentServices": 58.696519, "populationWan": 2851.7}, {"year": 2025, "country": "阿尔及利亚", "code": "DZ", "downloads": 642130303, "revenue": 2132640, "revenuePerDownload": 0.003321, "downloadYoY": -0.037378, "revenueYoY": -0.12538, "perCapitaDownloads": 13.537057, "cluster": "Transitioner", "mobileIndex": 57.886431, "contentServices": 48.691107, "populationWan": 4743.5}, {"year": 2025, "country": "老挝", "code": "LA", "downloads": 60013574, "revenue": 1967717, "revenuePerDownload": 0.032788, "downloadYoY": null, "revenueYoY": null, "perCapitaDownloads": 7.622707, "cluster": "Transitioner", "mobileIndex": 57.653299, "contentServices": 45.622207, "populationWan": 787.3}, {"year": 2025, "country": "加纳", "code": "GH", "downloads": 90161289, "revenue": 3892490, "revenuePerDownload": 0.043173, "downloadYoY": 0.239403, "revenueYoY": 0.141014, "perCapitaDownloads": 2.571335, "cluster": "Transitioner", "mobileIndex": 57.587832, "contentServices": 52.05857, "populationWan": 3506.4}, {"year": 2025, "country": "肯尼亚", "code": "KE", "downloads": 167004111, "revenue": 4336214, "revenuePerDownload": 0.025965, "downloadYoY": 0.200206, "revenueYoY": -0.068439, "perCapitaDownloads": 2.902804, "cluster": "Transitioner", "mobileIndex": 56.772647, "contentServices": 54.080887, "populationWan": 5753.2}, {"year": 2025, "country": "孟加拉国", "code": "BD", "downloads": 1171022647, "revenue": 5263672, "revenuePerDownload": 0.004495, "downloadYoY": 0.119951, "revenueYoY": 0.490204, "perCapitaDownloads": 6.665392, "cluster": "Transitioner", "mobileIndex": 56.725363, "contentServices": 58.9869, "populationWan": 17568.7}, {"year": 2025, "country": "伊拉克", "code": "IQ", "downloads": 1188657338, "revenue": 20011770, "revenuePerDownload": 0.016836, "downloadYoY": 0.061577, "revenueYoY": 0.112728, "perCapitaDownloads": 25.279287, "cluster": "Transitioner", "mobileIndex": 55.970446, "contentServices": 45.559347, "populationWan": 4702.1}, {"year": 2025, "country": "尼加拉瓜", "code": "NI", "downloads": 107554316, "revenue": 6251928, "revenuePerDownload": 0.058128, "downloadYoY": 0.018368, "revenueYoY": 0.046183, "perCapitaDownloads": 15.347362, "cluster": "Transitioner", "mobileIndex": 55.843917, "contentServices": 55.817561, "populationWan": 700.8}, {"year": 2025, "country": "尼日利亚", "code": "NG", "downloads": 265479245, "revenue": 24251656, "revenuePerDownload": 0.09135, "downloadYoY": 0.169246, "revenueYoY": -0.2738, "perCapitaDownloads": 1.117676, "cluster": "Transitioner", "mobileIndex": 53.410375, "contentServices": 48.915141, "populationWan": 23752.8}, {"year": 2025, "country": "缅甸", "code": "MM", "downloads": 230106490, "revenue": 11818719, "revenuePerDownload": 0.051362, "downloadYoY": 0.046425, "revenueYoY": 0.976778, "perCapitaDownloads": 4.195119, "cluster": "Transitioner", "mobileIndex": 52.664669, "contentServices": 44.596313, "populationWan": 5485.1}, {"year": 2025, "country": "塞内加尔", "code": "SN", "downloads": 113273018, "revenue": 2727715, "revenuePerDownload": 0.024081, "downloadYoY": 0.227392, "revenueYoY": 0.180288, "perCapitaDownloads": 5.983151, "cluster": "Transitioner", "mobileIndex": 51.367934, "contentServices": 44.1494, "populationWan": 1893.2}, {"year": 2025, "country": "科特迪瓦", "code": "CI", "downloads": 104589467, "revenue": 3649510, "revenuePerDownload": 0.034894, "downloadYoY": 0.325322, "revenueYoY": 0.078978, "perCapitaDownloads": 3.197281, "cluster": "Transitioner", "mobileIndex": 50.571233, "contentServices": 44.005166, "populationWan": 3271.2}, {"year": 2025, "country": "巴基斯坦", "code": "PK", "downloads": 1515896461, "revenue": 14353221, "revenuePerDownload": 0.009468, "downloadYoY": 0.070495, "revenueYoY": -0.050596, "perCapitaDownloads": 5.939568, "cluster": "Emerging", "mobileIndex": 49.145627, "contentServices": 53.667815, "populationWan": 25522.0}, {"year": 2025, "country": "喀麦隆", "code": "CM", "downloads": 41251064, "revenue": 1211398, "revenuePerDownload": 0.029366, "downloadYoY": 0.209951, "revenueYoY": 0.352802, "perCapitaDownloads": 1.380604, "cluster": "Emerging", "mobileIndex": 48.962306, "contentServices": 41.988456, "populationWan": 2987.9}, {"year": 2025, "country": "安哥拉", "code": "AO", "downloads": 39305151, "revenue": 707434, "revenuePerDownload": 0.017999, "downloadYoY": 0.04942, "revenueYoY": -0.201487, "perCapitaDownloads": 1.006792, "cluster": "Emerging", "mobileIndex": 47.971981, "contentServices": 35.395532, "populationWan": 3904.0}, {"year": 2025, "country": "坦桑尼亚", "code": "TZ", "downloads": 73029891, "revenue": 4472144, "revenuePerDownload": 0.061237, "downloadYoY": 0.426155, "revenueYoY": 0.253249, "perCapitaDownloads": 1.03521, "cluster": "Emerging", "mobileIndex": 46.774206, "contentServices": 43.565811, "populationWan": 7054.6}, {"year": 2025, "country": "乌干达", "code": "UG", "downloads": 58848562, "revenue": 1840509, "revenuePerDownload": 0.031275, "downloadYoY": 0.355412, "revenueYoY": 0.344541, "perCapitaDownloads": 1.145248, "cluster": "Emerging", "mobileIndex": 45.50703, "contentServices": 41.303943, "populationWan": 5138.5}, {"year": 2025, "country": "赞比亚", "code": "ZM", "downloads": 37214880, "revenue": 1845718, "revenuePerDownload": 0.049596, "downloadYoY": 0.127042, "revenueYoY": 0.264526, "perCapitaDownloads": 1.698224, "cluster": "Emerging", "mobileIndex": 44.18788, "contentServices": 43.153779, "populationWan": 2191.4}, {"year": 2025, "country": "贝宁", "code": "BJ", "downloads": 16119632, "revenue": 678286, "revenuePerDownload": 0.042078, "downloadYoY": 0.224216, "revenueYoY": 0.271124, "perCapitaDownloads": 1.088135, "cluster": "Emerging", "mobileIndex": 42.376599, "contentServices": 41.776508, "populationWan": 1481.4}, {"year": 2025, "country": "莫桑比克", "code": "MZ", "downloads": 45156895, "revenue": 2524824, "revenuePerDownload": 0.055912, "downloadYoY": 0.264338, "revenueYoY": 0.097624, "perCapitaDownloads": 1.267313, "cluster": "Emerging", "mobileIndex": 40.623198, "contentServices": 36.515288, "populationWan": 3563.2}, {"year": 2025, "country": "马里", "code": "ML", "downloads": 26429070, "revenue": 1373050, "revenuePerDownload": 0.051952, "downloadYoY": 0.317594, "revenueYoY": 0.539364, "perCapitaDownloads": 1.048814, "cluster": "Emerging", "mobileIndex": 37.161265, "contentServices": 27.418845, "populationWan": 2519.9}, {"year": 2025, "country": "布基纳法索", "code": "BF", "downloads": 30252425, "revenue": 870697, "revenuePerDownload": 0.028781, "downloadYoY": 0.421609, "revenueYoY": 0.522136, "perCapitaDownloads": 1.256591, "cluster": "Emerging", "mobileIndex": 35.289964, "contentServices": 33.0972, "populationWan": 2407.5}, {"year": 2025, "country": "刚果共和国", "code": "CG", "downloads": 25638271, "revenue": 413036, "revenuePerDownload": 0.01611, "downloadYoY": 0.441799, "revenueYoY": 0.171355, "perCapitaDownloads": 3.954083, "cluster": "Discoverer", "mobileIndex": 28.222844, "contentServices": 26.071157, "populationWan": 648.4}];
+    const stages = [
+      { name: 'Discoverer', min: 0, max: 35, color: 'var(--discoverer)' },
+      { name: 'Emerging', min: 35, max: 50, color: 'var(--emerging)' },
+      { name: 'Transitioner', min: 50, max: 65, color: 'var(--transitioner)' },
+      { name: 'Advanced', min: 65, max: 80, color: 'var(--advanced)' },
+      { name: 'Leader', min: 80, max: Infinity, color: 'var(--leader)' }
+    ];
+    const root = document.getElementById('mobile-game-dashboard');
+    const svg = document.getElementById('mgdChart');
+    const detail = document.getElementById('mgdDetail');
+    const tooltip = document.getElementById('mgdTooltip');
+    const metrics = document.getElementById('mgdMetrics');
+    const legend = document.getElementById('mgdLegend');
+    let selected = data.find(d => d.country === '美国') || data[0];
+    const tab3Data = [{"country":"巴西","code":"BR","adSpend":20.9,"perCapitaDownloads":15.5962471712121,"mobileIndex":77.1159110769347,"cluster":"Advanced","downloads":3319068553,"revenue":433127582,"revenuePerDownload":0.13049672674236},{"country":"沙特阿拉伯","code":"SA","adSpend":18.66,"perCapitaDownloads":16.0813962243739,"mobileIndex":84.750311620524,"cluster":"Leader","downloads":594593544,"revenue":317041953,"revenuePerDownload":0.533207863084366},{"country":"哥伦比亚","code":"CO","adSpend":11.65,"perCapitaDownloads":12.71227709355,"mobileIndex":72.211026642014,"cluster":"Advanced","downloads":679166116,"revenue":50025721,"revenuePerDownload":0.0736575630342548},{"country":"泰国","code":"TH","adSpend":11.49,"perCapitaDownloads":10.0589163082938,"mobileIndex":78.5721662590742,"cluster":"Advanced","downloads":720419586,"revenue":509721628,"revenuePerDownload":0.707534383997161},{"country":"马来西亚","code":"MY","adSpend":9.73,"perCapitaDownloads":12.9321629051087,"mobileIndex":80.3052839842609,"cluster":"Leader","downloads":465273357,"revenue":290879627,"revenuePerDownload":0.625180063770555},{"country":"厄瓜多尔","code":"EC","adSpend":8.12,"perCapitaDownloads":14.3532934390377,"mobileIndex":68.8164334227564,"cluster":"Advanced","downloads":262521737,"revenue":19089289,"revenuePerDownload":0.0727150795897713},{"country":"土耳其","code":"TR","adSpend":6.66,"perCapitaDownloads":18.7895588211321,"mobileIndex":77.8924377333135,"cluster":"Advanced","downloads":1613628522,"revenue":459396770,"revenuePerDownload":0.28469797337903},{"country":"约旦","code":"JO","adSpend":6.57,"perCapitaDownloads":16.9779281312386,"mobileIndex":66.1846074734618,"cluster":"Advanced","downloads":195602710,"revenue":18890486,"revenuePerDownload":0.0965757887505751},{"country":"乌干达","code":"UG","adSpend":5.69,"perCapitaDownloads":1.14524787389316,"mobileIndex":45.5070304157486,"cluster":"Emerging","downloads":58848562,"revenue":1840509,"revenuePerDownload":0.0312753436524073},{"country":"菲律宾","code":"PH","adSpend":5.65,"perCapitaDownloads":11.7262663652633,"mobileIndex":71.5382661392282,"cluster":"Advanced","downloads":1369475470,"revenue":243955452,"revenuePerDownload":0.178137876394383},{"country":"印度尼西亚","code":"ID","adSpend":5.51,"perCapitaDownloads":10.6240214334963,"mobileIndex":76.3199058363701,"cluster":"Advanced","downloads":3035506028,"revenue":305106387,"revenuePerDownload":0.1005125287796},{"country":"玻利维亚","code":"BO","adSpend":4.01,"perCapitaDownloads":11.9903729136862,"mobileIndex":62.1623436384806,"cluster":"Transitioner","downloads":150862872,"revenue":5029206,"revenuePerDownload":0.0333362737519673},{"country":"埃及","code":"EG","adSpend":3.5,"perCapitaDownloads":7.93464726357231,"mobileIndex":65.8533108152273,"cluster":"Advanced","downloads":939192458,"revenue":24759858,"revenuePerDownload":0.0263629225182726},{"country":"喀麦隆","code":"CM","adSpend":3.02,"perCapitaDownloads":1.38060390240637,"mobileIndex":48.9623063792688,"cluster":"Emerging","downloads":41251064,"revenue":1211398,"revenuePerDownload":0.0293664667655603},{"country":"阿尔及利亚","code":"DZ","adSpend":2.1,"perCapitaDownloads":13.5370570886476,"mobileIndex":57.8864313187348,"cluster":"Transitioner","downloads":642130303,"revenue":2132640,"revenuePerDownload":0.00332119507526185},{"country":"缅甸","code":"MM","adSpend":1.42,"perCapitaDownloads":4.19511932325755,"mobileIndex":52.6646687226669,"cluster":"Transitioner","downloads":230106490,"revenue":11818719,"revenuePerDownload":0.0513619541978151},{"country":"科特迪瓦","code":"CI","adSpend":1.42,"perCapitaDownloads":3.19728133406701,"mobileIndex":50.5712328043785,"cluster":"Transitioner","downloads":104589467,"revenue":3649510,"revenuePerDownload":0.0348936666825159},{"country":"塞内加尔","code":"SN","adSpend":1.14,"perCapitaDownloads":5.98315117261779,"mobileIndex":51.3679343005101,"cluster":"Transitioner","downloads":113273018,"revenue":2727715,"revenuePerDownload":0.0240808892370114},{"country":"肯尼亚","code":"KE","adSpend":0.93,"perCapitaDownloads":2.90280384829312,"mobileIndex":56.7726469079269,"cluster":"Transitioner","downloads":167004111,"revenue":4336214,"revenuePerDownload":0.0259647141261091},{"country":"孟加拉国","code":"BD","adSpend":0.9,"perCapitaDownloads":6.66539155999021,"mobileIndex":56.7253628403567,"cluster":"Transitioner","downloads":1171022647,"revenue":5263672,"revenuePerDownload":0.00449493612568878},{"country":"尼日利亚","code":"NG","adSpend":0.75,"perCapitaDownloads":1.11767557930012,"mobileIndex":53.4103747617157,"cluster":"Transitioner","downloads":265479245,"revenue":24251656,"revenuePerDownload":0.0913504782643178},{"country":"加纳","code":"GH","adSpend":0.46,"perCapitaDownloads":2.57133495893224,"mobileIndex":57.5878319894135,"cluster":"Transitioner","downloads":90161289,"revenue":3892490,"revenuePerDownload":0.043172519416842},{"country":"巴基斯坦","code":"PK","adSpend":0.28,"perCapitaDownloads":5.93956767102892,"mobileIndex":49.1456267776836,"cluster":"Emerging","downloads":1515896461,"revenue":14353221,"revenuePerDownload":0.009468470551433}];
+    const tab3Svg = document.getElementById('tab3Chart');
+    const tab3Detail = document.getElementById('tab3Detail');
+    const tab3Tooltip = document.getElementById('tab3Tooltip');
+    const tab3Legend = document.getElementById('tab3Legend');
+    let selectedTab3 = tab3Data.find(d => d.country === '沙特阿拉伯') || tab3Data[0];
+
+    function stageFor(index) {
+      return stages.find(s => index >= s.min && index < s.max) || stages[stages.length - 1];
+    }
+    function fmtNum(v, digits = 1) {
+      if (v === null || v === undefined || Number.isNaN(v)) return '—';
+      return Number(v).toLocaleString('zh-CN', { maximumFractionDigits: digits, minimumFractionDigits: 0 });
+    }
+    function fmtMoney(v) {
+      if (v === null || v === undefined || Number.isNaN(v)) return '—';
+      const n = Number(v);
+      if (Math.abs(n) >= 1e9) return '$' + (n / 1e9).toLocaleString('zh-CN', { maximumFractionDigits: 2 }) + 'B';
+      if (Math.abs(n) >= 1e6) return '$' + (n / 1e6).toLocaleString('zh-CN', { maximumFractionDigits: 1 }) + 'M';
+      return '$' + n.toLocaleString('zh-CN', { maximumFractionDigits: 0 });
+    }
+    function fmtPct(v) {
+      if (v === null || v === undefined || Number.isNaN(v)) return '—';
+      const sign = v > 0 ? '+' : '';
+      return sign + (Number(v) * 100).toLocaleString('zh-CN', { maximumFractionDigits: 1 }) + '%';
+    }
+    function median(values) {
+      const nums = values.filter(v => v !== null && v !== undefined && !Number.isNaN(v)).map(Number).sort((a, b) => a - b);
+      const mid = Math.floor(nums.length / 2);
+      return nums.length % 2 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+    }
+    function renderMetrics() {
+      const avgPc = data.reduce((s, d) => s + d.perCapitaDownloads, 0) / data.length;
+      const medianPc = median(data.map(d => d.perCapitaDownloads));
+      const medianIndex = median(data.map(d => d.mobileIndex));
+      const items = [
+        ['国家/地区', data.length],
+        ['平均人均下载', fmtNum(avgPc, 2)],
+        ['人均下载中位数', fmtNum(medianPc, 2)],
+        ['Mobile Index 中位数', fmtNum(medianIndex, 1)]
+      ];
+      metrics.innerHTML = items.map(([label, value]) => `<div class="metric"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
+    }
+    function renderLegend() {
+      legend.innerHTML = stages.map(s => `<span class="legend-item"><span class="swatch" style="background:${s.color}"></span>${s.name} ${s.min}${s.max === Infinity ? '+' : '-' + s.max}</span>`).join('');
+    }
+    function renderDetail(d) {
+      const stage = stageFor(d.mobileIndex);
+      detail.innerHTML = `
+        <div class="detail-kicker">当前选中国家/地区</div>
+        <div class="country-name">${d.country}</div>
+        <div class="country-code">${d.code || ''} · 2025</div>
+        <div class="stage-badge"><span class="stage-dot" style="background:${stage.color}"></span>${stage.name} ${stage.min}${stage.max === Infinity ? '+' : '-' + stage.max}</div>
+        <div class="detail-grid">
+          <div class="field"><div class="field-label">Mobile Index</div><div class="field-value">${fmtNum(d.mobileIndex, 2)}</div></div>
+          <div class="field"><div class="field-label">游戏人均下载数</div><div class="field-value">${fmtNum(d.perCapitaDownloads, 2)}</div></div>
+          <div class="field"><div class="field-label">双端总下载量</div><div class="field-value">${fmtNum(d.downloads, 0)}</div></div>
+          <div class="field"><div class="field-label">双端总收入</div><div class="field-value">${fmtMoney(d.revenue)}</div></div>
+          <div class="field"><div class="field-label">收入/下载</div><div class="field-value">${d.revenuePerDownload == null ? '—' : '$' + fmtNum(d.revenuePerDownload, 3)}</div></div>
+          <div class="field"><div class="field-label">总人口</div><div class="field-value">${fmtNum(d.populationWan, 1)} 万</div></div>
+          <div class="field"><div class="field-label">年度下载同比</div><div class="field-value">${fmtPct(d.downloadYoY)}</div></div>
+          <div class="field"><div class="field-label">收入同比</div><div class="field-value">${fmtPct(d.revenueYoY)}</div></div>
+          <div class="field wide"><div class="field-label">Content and Services</div><div class="field-value">${fmtNum(d.contentServices, 2)}</div></div>
+        </div>
+        <div class="hint">点击图中的任意国家点位，底部会更新为该国家/地区的明细数据。</div>`;
+    }
+    function draw() {
+      const box = svg.parentElement.getBoundingClientRect();
+      const width = Math.max(360, box.width);
+      const height = Math.max(480, box.height || 620);
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      svg.innerHTML = '';
+      const margin = width < 560 ? { top: 24, right: 18, bottom: 72, left: 82 } : { top: 24, right: 34, bottom: 72, left: 98 };
+      const innerW = width - margin.left - margin.right;
+      const innerH = height - margin.top - margin.bottom;
+      const minX = 0;
+      const maxX = Math.ceil(Math.max(...data.map(d => d.perCapitaDownloads)) * 1.04);
+      const breakX = 20;
+      const breakShare = maxX > breakX ? (width < 560 ? 0.84 : 0.9) : 1;
+      const revenueBands = [
+        { label: '< 0.02', min: 0, max: 0.02, share: 0.16, color: '#edf1f4' },
+        { label: '0.02～0.04', min: 0.02, max: 0.04, share: 0.16, color: '#e7f3eb' },
+        { label: '0.04～0.06', min: 0.04, max: 0.06, share: 0.16, color: '#fff5d8' },
+        { label: '0.06～0.1', min: 0.06, max: 0.1, share: 0.16, color: '#fff0df' },
+        { label: '0.1～0.5', min: 0.1, max: 0.5, share: 0.22, color: '#e3f0fb' },
+        { label: '0.5以上', min: 0.5, max: Infinity, share: 0.14, color: '#efeafa' }
+      ];
+      let bandStart = 0;
+      revenueBands.forEach(band => {
+        band.start = bandStart;
+        band.end = bandStart + band.share;
+        bandStart = band.end;
+      });
+      const maxAboveHalf = Math.max(0.5, ...data.map(d => d.revenuePerDownload || 0));
+      const x = v => {
+        if (maxX <= breakX || v <= breakX) return margin.left + (v - minX) / (breakX - minX) * innerW * breakShare;
+        return margin.left + innerW * breakShare + (v - breakX) / (maxX - breakX) * innerW * (1 - breakShare);
+      };
+      const yByShare = share => margin.top + (1 - share) * innerH;
+      const y = value => {
+        const band = revenueBands.find(item => value >= item.min && value < item.max) || revenueBands[revenueBands.length - 1];
+        const ratio = band.max === Infinity
+          ? (maxAboveHalf === band.min ? 0 : Math.min(1, (value - band.min) / (maxAboveHalf - band.min)))
+          : Math.min(1, Math.max(0, (value - band.min) / (band.max - band.min)));
+        return yByShare(band.start + ratio * band.share);
+      };
+      const g = (name, attrs = {}) => {
+        const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+        Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+        svg.appendChild(el);
+        return el;
+      };
+      function addText(text, attrs) { const t = g('text', attrs); t.textContent = text; return t; }
+      revenueBands.forEach(band => {
+        const top = yByShare(band.end);
+        const bottom = yByShare(band.start);
+        g('rect', { x: margin.left, y: top, width: innerW, height: bottom - top, fill: band.color, class: 'revenue-band' });
+      });
+      const xTicks = width < 560 ? [0, 5, 10, 15, 20, 25] : [0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 25];
+      xTicks.filter(val => val <= maxX).forEach(val => {
+        const xx = x(val);
+        g('line', { x1: xx, x2: xx, y1: margin.top, y2: margin.top + innerH, class: 'grid' });
+        addText(fmtNum(val, val % 1 === 0 ? 0 : 1), { x: xx, y: margin.top + innerH + 24, 'text-anchor': 'middle', class: 'axis' });
+      });
+      revenueBands.forEach((band, index) => {
+        if (index > 0) {
+          const boundaryY = yByShare(band.start);
+          g('line', { x1: margin.left, x2: margin.left + innerW, y1: boundaryY, y2: boundaryY, class: 'band-separator' });
+        }
+        addText(band.label, { x: margin.left - 12, y: yByShare((band.start + band.end) / 2) + 4, 'text-anchor': 'end', class: 'band-label' });
+      });
+      g('rect', { x: margin.left, y: margin.top, width: innerW, height: innerH, class: 'frame' });
+      if (maxX > breakX) {
+        const bx = x(breakX);
+        g('line', { x1: bx - 5, y1: margin.top + innerH + 8, x2: bx, y2: margin.top + innerH - 6, class: 'axis-break' });
+        g('line', { x1: bx + 2, y1: margin.top + innerH + 8, x2: bx + 7, y2: margin.top + innerH - 6, class: 'axis-break' });
+      }
+      addText('游戏人均下载数（次/人）', { x: margin.left + innerW / 2, y: height - 22, 'text-anchor': 'middle', class: 'axis-title', 'font-weight': 700 });
+      addText('收入/下载（USD，分段比例刻度）', { x: 18, y: margin.top + innerH / 2, 'text-anchor': 'middle', class: 'axis-title', 'font-weight': 700, transform: `rotate(-90 18 ${margin.top + innerH / 2})` });
+      const focusCountries = [
+        '尼日利亚', '印度尼西亚', '菲律宾', '科特迪瓦', '肯尼亚', '加纳', '厄瓜多尔',
+        '缅甸', '哥伦比亚', '坦桑尼亚', '巴基斯坦', '印度', '俄罗斯', '埃及', '泰国'
+      ];
+      const labeled = new Set([
+        ...data.filter(d => stageFor(d.mobileIndex).name === 'Leader').map(d => d.country),
+        ...focusCountries
+      ]);
+      const labelPositions = {
+        '德国': { dx: -8, dy: 18, anchor: 'end' },
+        '英国': { dx: 0, dy: -10, anchor: 'middle' },
+        '韩国': { dx: -8, dy: -8, anchor: 'end' },
+        '马来西亚': { dx: 8, dy: 16 },
+        '俄罗斯': { dx: -8, dy: -8, anchor: 'end' },
+        '印度尼西亚': { dx: -8, dy: -8, anchor: 'end' },
+        '菲律宾': { dx: -8, dy: -8, anchor: 'end' },
+        '泰国': { dx: 8, dy: 18 },
+        '哥伦比亚': { dx: -8, dy: -8, anchor: 'end' },
+        '厄瓜多尔': { dx: -8, dy: 18, anchor: 'end' },
+        '坦桑尼亚': { dx: -8, dy: -8, anchor: 'end' },
+        '缅甸': { dx: 8, dy: 16 },
+        '肯尼亚': { dx: 8, dy: 16 },
+        '科特迪瓦': { dx: 8, dy: -8 },
+        '印度': { dx: -8, dy: -8, anchor: 'end' },
+        '巴基斯坦': { dx: 8, dy: -8 },
+        '埃及': { dx: 8, dy: 18 }
+      };
+      const referenceCountries = new Set(['日本', '韩国', '德国', '英国', '法国', '美国', '俄罗斯']);
+      const highlightCountries = new Set(['尼日利亚', '马来西亚', '菲律宾', '印度尼西亚', '哥伦比亚', '厄瓜多尔', '缅甸', '科特迪瓦', '坦桑尼亚']);
+      data.forEach((d, i) => {
+        const stage = stageFor(d.mobileIndex);
+        const isHighlight = highlightCountries.has(d.country);
+        const radius = 5.2 + Math.min(4.2, Math.log10(Math.max(1, d.downloads)) - 6.7);
+        const circle = g('circle', {
+          cx: x(d.perCapitaDownloads), cy: y(d.revenuePerDownload), r: Math.max(4.8, radius),
+          fill: stage.color, class: 'point' + (d === selected ? ' active' : '') + (isHighlight ? ' highlight-point' : ''), tabindex: 0,
+          'aria-label': `${d.country} 收入/下载 ${fmtNum(d.revenuePerDownload, 3)} 美元，Mobile Index ${fmtNum(d.mobileIndex, 1)}，游戏人均下载 ${fmtNum(d.perCapitaDownloads, 1)}`
+        });
+        circle.addEventListener('mouseenter', ev => showTip(ev, d));
+        circle.addEventListener('mousemove', ev => showTip(ev, d));
+        circle.addEventListener('mouseleave', hideTip);
+        circle.addEventListener('click', () => { selected = d; renderDetail(d); draw(); });
+        circle.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); selected = d; renderDetail(d); draw(); } });
+        if (labeled.has(d.country) && width > 620) {
+          const position = labelPositions[d.country] || { dx: 8, dy: -8, anchor: 'start' };
+          const labelClass = 'point-label' + (referenceCountries.has(d.country) ? ' reference-label' : '') + (isHighlight ? ' highlight-label' : '');
+          addText(d.country, { x: x(d.perCapitaDownloads) + position.dx, y: y(d.revenuePerDownload) + position.dy, class: labelClass, 'text-anchor': position.anchor || 'start' });
+        }
+      });
+    }
+    function showTip(ev, d) {
+      const st = stageFor(d.mobileIndex);
+      tooltip.innerHTML = `<strong>${d.country} · ${st.name}</strong>Mobile Index：${fmtNum(d.mobileIndex, 2)}<br>人均下载：${fmtNum(d.perCapitaDownloads, 2)}<br>收入/下载：${d.revenuePerDownload == null ? '—' : '$' + fmtNum(d.revenuePerDownload, 3)}`;
+      tooltip.style.left = ev.clientX + 'px';
+      tooltip.style.top = ev.clientY + 'px';
+      tooltip.style.opacity = '1';
+    }
+    function hideTip() { tooltip.style.opacity = '0'; }
+    function renderTab3Legend() {
+      tab3Legend.innerHTML = stages.map(s => `<span class="legend-item"><span class="swatch" style="background:${s.color}"></span>${s.name} ${s.min}${s.max === Infinity ? '+' : '-' + s.max}</span>`).join('');
+    }
+    function renderTab3Detail(d) {
+      const stage = stageFor(d.mobileIndex);
+      tab3Detail.innerHTML = `
+        <div class="detail-kicker">当前选中国家/地区</div>
+        <div class="country-name">${d.country}</div>
+        <div class="country-code">${d.code || ''} · 2025</div>
+        <div class="stage-badge"><span class="stage-dot" style="background:${stage.color}"></span>${stage.name} ${stage.min}${stage.max === Infinity ? '+' : '-' + stage.max}</div>
+        <div class="detail-grid">
+          <div class="field"><div class="field-label">移动用户人均广告消耗</div><div class="field-value">$${fmtNum(d.adSpend, 2)}</div></div>
+          <div class="field"><div class="field-label">游戏人均下载数</div><div class="field-value">${fmtNum(d.perCapitaDownloads, 2)}</div></div>
+          <div class="field"><div class="field-label">Mobile Index</div><div class="field-value">${fmtNum(d.mobileIndex, 2)}</div></div>
+          <div class="field"><div class="field-label">收入/下载</div><div class="field-value">$${fmtNum(d.revenuePerDownload, 3)}</div></div>
+          <div class="field"><div class="field-label">双端总收入</div><div class="field-value">${fmtMoney(d.revenue)}</div></div>
+        </div>
+        <div class="hint">悬停或点击图中的任意国家点位，可查看该国家/地区的投放市场数据。</div>`;
+    }
+    function showTab3Tip(ev, d) {
+      const stage = stageFor(d.mobileIndex);
+      tab3Tooltip.innerHTML = `<strong>${d.country} · ${stage.name}</strong>移动用户人均广告消耗：$${fmtNum(d.adSpend, 2)}<br>游戏人均下载：${fmtNum(d.perCapitaDownloads, 2)}<br>Mobile Index：${fmtNum(d.mobileIndex, 2)}`;
+      tab3Tooltip.style.left = ev.clientX + 'px';
+      tab3Tooltip.style.top = ev.clientY + 'px';
+      tab3Tooltip.style.opacity = '1';
+    }
+    function hideTab3Tip() { tab3Tooltip.style.opacity = '0'; }
+    function drawTab3() {
+      if (!tab3Svg) return;
+      const box = tab3Svg.parentElement.getBoundingClientRect();
+      const width = Math.max(360, box.width);
+      const height = Math.max(480, box.height || 620);
+      tab3Svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      tab3Svg.innerHTML = '';
+      const margin = width < 560 ? { top: 24, right: 52, bottom: 72, left: 72 } : { top: 24, right: 70, bottom: 72, left: 84 };
+      const innerW = width - margin.left - margin.right;
+      const innerH = height - margin.top - margin.bottom;
+      const maxX = Math.ceil(Math.max(...tab3Data.map(d => d.perCapitaDownloads)));
+      const maxY = Math.ceil(Math.max(...tab3Data.map(d => d.adSpend)) / 5) * 5;
+      const expandedYMax = 4;
+      const expandedYShare = 0.45;
+      const x = value => margin.left + value / maxX * innerW;
+      const y = value => {
+        if (value <= expandedYMax) return margin.top + innerH - value / expandedYMax * innerH * expandedYShare;
+        return margin.top + innerH * (1 - expandedYShare) - (value - expandedYMax) / (maxY - expandedYMax) * innerH * (1 - expandedYShare);
+      };
+      const g = (name, attrs = {}) => {
+        const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+        Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+        tab3Svg.appendChild(el);
+        return el;
+      };
+      const addText = (text, attrs) => { const element = g('text', attrs); element.textContent = text; return element; };
+      const xTicks = [...new Set([0, 5, 10, 15, maxX].filter(value => value <= maxX))];
+      xTicks.forEach(value => {
+        const xx = x(value);
+        g('line', { x1: xx, x2: xx, y1: margin.top, y2: margin.top + innerH, class: 'grid' });
+        addText(value, { x: xx, y: margin.top + innerH + 24, 'text-anchor': 'middle', class: 'axis' });
+      });
+      [...new Set([0, 1, 2, 3, 4, 8, 12, 16, 20, maxY])].filter(value => value <= maxY).forEach(value => {
+        const yy = y(value);
+        g('line', { x1: margin.left, x2: margin.left + innerW, y1: yy, y2: yy, class: 'grid' });
+        addText('$' + value, { x: margin.left - 12, y: yy + 4, 'text-anchor': 'end', class: 'axis' });
+      });
+      g('rect', { x: margin.left, y: margin.top, width: innerW, height: innerH, class: 'frame' });
+      addText('游戏人均下载数（次/人）', { x: margin.left + innerW / 2, y: height - 22, 'text-anchor': 'middle', class: 'axis-title', 'font-weight': 700 });
+      addText('移动用户人均广告消耗（USD）', { x: 18, y: margin.top + innerH / 2, 'text-anchor': 'middle', class: 'axis-title', 'font-weight': 700, transform: `rotate(-90 18 ${margin.top + innerH / 2})` });
+      const labelPositions = {
+        '巴西': { dx: -8, dy: -8, anchor: 'end' },
+        '沙特阿拉伯': { dx: 8, dy: -8 },
+        '哥伦比亚': { dx: 8, dy: -8 },
+        '泰国': { dx: -8, dy: 16, anchor: 'end' },
+        '马来西亚': { dx: 8, dy: 16 },
+        '厄瓜多尔': { dx: 8, dy: -8 },
+        '土耳其': { dx: -8, dy: -8, anchor: 'end' },
+        '约旦': { dx: 8, dy: 16 },
+        '乌干达': { dx: 8, dy: -8 },
+        '菲律宾': { dx: 0, dy: -10, anchor: 'middle' },
+        '印度尼西亚': { dx: -8, dy: -8, anchor: 'end' },
+        '玻利维亚': { dx: 0, dy: 18, anchor: 'middle' },
+        '埃及': { dx: 8, dy: -8 },
+        '喀麦隆': { dx: -8, dy: -8, anchor: 'end' },
+        '阿尔及利亚': { dx: 8, dy: -8 },
+        '缅甸': { dx: 8, dy: 16 },
+        '科特迪瓦': { dx: 0, dy: -10, anchor: 'middle' },
+        '塞内加尔': { dx: 8, dy: -8 },
+        '肯尼亚': { dx: 8, dy: 16 },
+        '尼日利亚': { dx: 8, dy: -8 },
+        '加纳': { dx: -8, dy: 16, anchor: 'end' },
+        '孟加拉国': { dx: 8, dy: 16 },
+        '巴基斯坦': { dx: 8, dy: -8 }
+      };
+      tab3Data.forEach(d => {
+        const stage = stageFor(d.mobileIndex);
+        const circle = g('circle', {
+          cx: x(d.perCapitaDownloads), cy: y(d.adSpend), r: 6.6,
+          fill: stage.color, class: 'point' + (d === selectedTab3 ? ' active' : ''), tabindex: 0,
+          'aria-label': `${d.country} 移动用户人均广告消耗 ${fmtNum(d.adSpend, 2)} 美元，游戏人均下载 ${fmtNum(d.perCapitaDownloads, 2)}`
+        });
+        circle.addEventListener('mouseenter', event => showTab3Tip(event, d));
+        circle.addEventListener('mousemove', event => showTab3Tip(event, d));
+        circle.addEventListener('mouseleave', hideTab3Tip);
+        circle.addEventListener('click', () => { selectedTab3 = d; renderTab3Detail(d); drawTab3(); });
+        circle.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectedTab3 = d; renderTab3Detail(d); drawTab3(); } });
+        const position = labelPositions[d.country] || { dx: 8, dy: -8, anchor: 'start' };
+        addText(d.country, { x: x(d.perCapitaDownloads) + position.dx, y: y(d.adSpend) + position.dy, class: 'point-label', 'text-anchor': position.anchor || 'start' });
+      });
+    }
+    renderMetrics();
+    renderLegend();
+    renderDetail(selected);
+    renderTab3Legend();
+    renderTab3Detail(selectedTab3);
+    draw();
+    drawTab3();
+    new ResizeObserver(draw).observe(svg.parentElement);
+    new ResizeObserver(drawTab3).observe(tab3Svg.parentElement);
+    const tabButtons = Array.from(root.querySelectorAll('.tab-button'));
+    const tabPanels = Array.from(root.querySelectorAll('.tab-panel'));
+    const tab2Frame = document.getElementById('tab2Frame');
+    function resizeTab2Frame() {
+      if (!tab2Frame) return;
+      try {
+        const doc = tab2Frame.contentDocument || tab2Frame.contentWindow.document;
+        const height = Math.max(
+          920,
+          doc.documentElement.scrollHeight,
+          doc.body ? doc.body.scrollHeight : 0
+        );
+        tab2Frame.style.height = height + 24 + 'px';
+      } catch (error) {
+        tab2Frame.style.height = '1120px';
+      }
+    }
+    function activateTab(panelId) {
+      tabButtons.forEach(button => {
+        const active = button.dataset.tabTarget === panelId;
+        button.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      tabPanels.forEach(panel => panel.classList.toggle('active', panel.id === panelId));
+      if (panelId === 'tab1Panel') {
+        requestAnimationFrame(draw);
+      }
+      if (panelId === 'tab2Panel') {
+        requestAnimationFrame(resizeTab2Frame);
+      }
+      if (panelId === 'tab3Panel') {
+        requestAnimationFrame(drawTab3);
+      }
+    }
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => activateTab(button.dataset.tabTarget));
+    });
+    if (tab2Frame) {
+      tab2Frame.addEventListener('load', resizeTab2Frame);
+    }
+  })();
+  </script>
+</div>
+</body>
+</html>
