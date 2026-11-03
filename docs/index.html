@@ -68,9 +68,59 @@
 .profile-slide .scroll-cue svg{color:var(--blue);animation:profile-scroll-bob 1.4s ease-in-out infinite}
 @keyframes profile-scroll-bob{50%{transform:translateY(12px);filter:drop-shadow(0 0 6px #2355e688)}}
 @media(prefers-reduced-motion:reduce){.profile-slide .scroll-cue svg{animation:none}}
-#experience .metrics strong{font-size:clamp(28px,3.25vw,48px);font-weight:800;line-height:1.1}
-#experience .metrics strong span{font-weight:800}
+#experience .metrics strong{font-size:clamp(24px,3.2vw,46px);font-weight:650;line-height:1.1}
+#experience .metrics strong span{font-size:inherit;font-weight:inherit;vertical-align:baseline}
+#experience .case-card{display:flex;flex-direction:column;gap:14px}
+#experience .case-card h3,#experience .case-card .metrics{margin-top:0}
+#experience .case-card .case-highlight{margin-top:auto}
+#experience .metrics strong .metric-direction{display:inline-block;font-family:Arial,sans-serif;font-size:.7em;font-weight:700;color:#c62828;vertical-align:.12em}
+
+@media(prefers-reduced-motion:no-preference){
+  .profile-reveal-ready .deck{scroll-snap-type:none}
+  .profile-reveal-ready .profile-slide{min-height:calc(100% + 180px);align-items:flex-start}
+  .profile-reveal-ready .profile-slide>.slide-inner{margin-block:0;position:sticky;top:20px}
+  .profile-reveal-ready .profile-details{transition:opacity .55s ease,transform .55s ease}
+  .profile-reveal-ready .profile-details :is(.facts>div,.profile-projects){transition:opacity .45s ease,transform .45s ease;transition-delay:calc(140ms + var(--reveal-order,0) * 85ms)}
+  .profile-reveal-ready:not(.profile-revealed) .profile-details,
+  .profile-reveal-ready:not(.profile-revealed) .profile-details :is(.facts>div,.profile-projects){opacity:0;transform:translateY(22px)}
+}
+@media(prefers-reduced-motion:no-preference){
+  :is(#experience,#trial-review) .experience-reveal-item{transition:opacity .45s ease,transform .45s ease;transition-delay:calc(var(--reveal-order) * 90ms)}
+  :is(#experience,#trial-review) .experience-reveal-pending .experience-reveal-item{opacity:0;transform:translateY(18px)}
+}
 </style></head><body data-page="0"><a class="skip-link" href="#profile">跳至正文</a><header class="topbar"><a class="brand" href="index.html" aria-label="返回个人信息介绍"><span class="brand-icon" aria-hidden="true"><i></i><i></i><i></i></span><span>转正汇报<small>PROBATION REVIEW / 2026</small></span></a><nav class="progress-nav" aria-label="答辩章节"><a href="index.html" data-chapter="0" aria-current="page"><small>01</small>个人信息介绍<i></i></a><a href="02-ai-exploration.html" data-chapter="1"><small>02</small>前期 AI 探索<i></i></a><a href="03-project-validation.html" data-chapter="2"><small>03</small>项目落地验证<i></i></a><a href="04-outlook.html" data-chapter="3"><small>04</small>未来工作展望<i></i></a><a href="05-summary-qa.html" data-chapter="4"><small>05</small>总结&QA<i></i></a></nav><span class="chapter-count"><strong>01</strong> / 05</span></header><main class="deck" id="main" tabindex="-1" aria-label="个人信息介绍纵向演示"><section id="profile" class="slide profile-slide" data-chapter="0" data-label="基本信息" aria-labelledby="profile-title"><div class="slide-inner"><div class="intro-kicker"><span class="eyebrow">01 / 个人信息介绍</span><span class="review-tag">2026 · 转正汇报答辩</span></div><div class="profile-hero"><div class="hero-name"><p class="micro">个人信息介绍</p><h1 id="profile-title">陈天元<span>CHEN TIANYUAN</span></h1><div class="role-row"><span>高级产品经理</span><span>P3-1</span></div></div><div class="profile-details"><span class="micro">PROFILE / 个人档案</span><dl class="facts"><div><dt>所属部门</dt><dd>桌面生态业务部</dd></div><div><dt>学历</dt><dd>硕士</dd></div><div><dt>入职时间</dt><dd class="date">2026.05.11</dd></div><div><dt>导师</dt><dd>刘晨耀</dd></div><div><dt>直属上级</dt><dd>关佐龙</dd></div></dl><div class="profile-projects"><span class="micro">试用期项目</span><div class="project-tags"><span><i>01</i>AI 锁屏游戏分发</span><span><i>02</i>OPC 应用复刻</span></div></div></div></div><a class="scroll-cue" href="#experience">向下滚动，了解过往经历 <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a></div></section><section id="experience" class="slide experience-slide" data-chapter="0" data-label="过往经历与项目" aria-labelledby="experience-title"><div class="slide-inner"><div class="experience-lead"><p class="eyebrow">01 / 个人信息介绍</p><h2 id="experience-title">过往经历</h2><p class="profile-experience-summary">主导多个北美 AI 产品 <strong>0–1 落地</strong>，完成产品业务闭环</p></div><div class="case-grid">
-<article class="case-card panel"><div class="case-top"><span class="case-index">01</span><span class="micro"></span><span class="arrow-icon">↗</span></div><h3>北美短剧分发平台</h3><p class="case-description">跑通素人内容分发业务，完成 AI 生成到商业转化闭环。</p><div class="metrics"><div><strong><span>＞</span>1,000</strong><span>月活跃用户（MAU）</span></div><div><strong>100<span>+</span></strong><span>人均月发布量</span></div><div><strong><span>$</span>15</strong><span>平均单次发布变现</span></div></div><div class="case-highlight"><span class="highlight-icon">✦</span><p><b>Agent 7×24 小时社媒账号运营托管</b><br></p></div></article>
-<article class="case-card panel"><div class="case-top"><span class="case-index">02</span><span class="micro"></span><span class="arrow-icon">↗</span></div><h3>企业 AI 中台</h3><p class="case-description">支撑跨境电商 GMV 增长与成本结构优化。</p><div class="metrics"><div><strong>60<span>% ↓</span></strong><span>商品上新周期</span></div><div><strong><span>+</span>18<span>%</span></strong><span>订单数</span></div><div><strong>亿级</strong><span>间接赋能 GMV 增长</span></div></div><div class="case-highlight"><span class="highlight-icon">✦</span><p><b>市场 &amp; 供应链 Agent 全面覆盖</b><br></p></div></article>
-</div></div></section><section id="trial-review" class="slide trial-slide" data-chapter="0" data-label="试用期回顾" aria-labelledby="trial-review-title"><div class="slide-inner"><div class="experience-lead"><p class="eyebrow">01 / 个人信息介绍</p><h2 id="trial-review-title">试用期回顾</h2></div><div class="trial-timeline"><article class="trial-stage"><div class="trial-stage-head"><span>01</span><p>第 1 个月</p></div><ul><li>公司制度、企业背景培训</li><li>业务学习了解</li></ul></article><article class="trial-stage"><div class="trial-stage-head"><span>02</span><p>第 2–3 个月</p></div><ul><li>AI 方向探索脑爆</li><li>Demo 构建及初步验证</li></ul></article><article class="trial-stage"><div class="trial-stage-head"><span>03</span><p>第 4–6 个月</p></div><ul><li>AI 项目落地实践</li><li>跨部门沟通协作</li></ul></article></div></div></section></main><nav class="screen-dots" aria-label="本模块分屏导航"><a href="#profile" aria-label="第 1 屏：基本信息" title="基本信息" aria-current="true"><i></i></a><a href="#experience" aria-label="第 2 屏：过往经历与项目" title="过往经历与项目"><i></i></a><a href="#trial-review" aria-label="第 3 屏：试用期回顾" title="试用期回顾"><i></i></a></nav><footer class="presentation-controls"><div class="current-screen"><strong>01</strong><span>/ 03</span><i></i><span class="screen-label">基本信息</span></div><nav class="module-navigation" aria-label="切换模块"><span class="module-start">个人信息介绍</span><span class="module-divider"></span><a class="module-link next-module" href="02-ai-exploration.html">前期 AI 探索<span>→</span></a></nav><div class="control-actions"><span class="keyboard-tip">↑ ↓ 屏内翻页</span><button class="fullscreen-button" aria-label="全屏演示" title="全屏演示（F）">⛶</button><button class="previous-screen" aria-label="上一屏" title="上一屏（↑）" disabled>↑</button><button class="next-screen" aria-label="下一屏" title="下一屏（↓）" >↓</button></div></footer><div class="toast" role="status"></div><script src="assets/image-preview.js" defer></script></body></html>
+<article class="case-card panel"><h3>北美短剧分发平台</h3><p class="case-description">跑通素人内容分发业务，完成 AI 生成到商业转化闭环。</p><div class="metrics"><div><strong>1000+</strong><span>月活跃用户（MAU）</span></div><div><strong>100+</strong><span>人均月发布量</span></div><div><strong>$15</strong><span>平均单次发布变现</span></div></div><div class="case-highlight"><span class="highlight-icon">✦</span><p><b>Agent 7×24 小时社媒账号运营托管</b><br></p></div></article>
+<article class="case-card panel"><h3>企业 AI 中台</h3><p class="case-description">支撑跨境电商 GMV 增长与成本结构优化。</p><div class="metrics"><div><strong>-60%</strong><span>商品上新周期</span></div><div><strong>+18%</strong><span>订单数</span></div><div><strong>亿级</strong><span>间接赋能 GMV 增长</span></div></div><div class="case-highlight"><span class="highlight-icon">✦</span><p><b>市场 &amp; 供应链 Agent 全面覆盖</b><br></p></div></article>
+</div></div></section><section id="trial-review" class="slide trial-slide" data-chapter="0" data-label="试用期回顾" aria-labelledby="trial-review-title"><div class="slide-inner"><div class="experience-lead"><p class="eyebrow">01 / 个人信息介绍</p><h2 id="trial-review-title">试用期回顾</h2></div><div class="trial-timeline"><article class="trial-stage"><div class="trial-stage-head"><span>01</span><p>第 1 个月</p></div><ul><li>公司制度、企业背景培训</li><li>业务学习了解</li></ul></article><article class="trial-stage"><div class="trial-stage-head"><span>02</span><p>第 2–3 个月</p></div><ul><li>AI 方向探索脑爆</li><li>Demo 构建及初步验证</li></ul></article><article class="trial-stage"><div class="trial-stage-head"><span>03</span><p>第 4–6 个月</p></div><ul><li>AI 项目落地实践</li><li>跨部门沟通协作</li></ul></article></div></div></section></main><nav class="screen-dots" aria-label="本模块分屏导航"><a href="#profile" aria-label="第 1 屏：基本信息" title="基本信息" aria-current="true"><i></i></a><a href="#experience" aria-label="第 2 屏：过往经历与项目" title="过往经历与项目"><i></i></a><a href="#trial-review" aria-label="第 3 屏：试用期回顾" title="试用期回顾"><i></i></a></nav><footer class="presentation-controls"><div class="current-screen"><strong>01</strong><span>/ 03</span><i></i><span class="screen-label">基本信息</span></div><nav class="module-navigation" aria-label="切换模块"><span class="module-start">个人信息介绍</span><span class="module-divider"></span><a class="module-link next-module" href="02-ai-exploration.html">前期 AI 探索<span>→</span></a></nav><div class="control-actions"><span class="keyboard-tip">↑ ↓ 屏内翻页</span><button class="fullscreen-button" aria-label="全屏演示" title="全屏演示（F）">⛶</button><button class="previous-screen" aria-label="上一屏" title="上一屏（↑）" disabled>↑</button><button class="next-screen" aria-label="下一屏" title="下一屏（↓）" >↓</button></div></footer><div class="toast" role="status"></div><script src="assets/image-preview.js" defer></script><script>
+(() => {
+  const deck = document.querySelector('.deck');
+  const items = document.querySelectorAll('.profile-details .facts > div, .profile-details .profile-projects');
+  items.forEach((item, index) => item.style.setProperty('--reveal-order', index));
+  document.body.classList.add('profile-reveal-ready');
+  const reveal = () => {
+    if (deck.scrollTop < 32) return;
+    document.body.classList.add('profile-revealed');
+    deck.removeEventListener('scroll', reveal);
+  };
+  deck.addEventListener('scroll', reveal, { passive: true });
+  reveal();
+})();
+</script><script>
+if ('IntersectionObserver' in window && matchMedia('(prefers-reduced-motion:no-preference)').matches) {
+  const observer = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.remove('experience-reveal-pending');
+      observer.unobserve(entry.target);
+    }
+  }, {root: document.querySelector('.deck'), threshold: .35});
+  document.querySelectorAll('#experience .case-card, #trial-review .trial-stage').forEach(card => {
+    card.querySelectorAll('.metrics > div, .case-highlight, li').forEach((item, index) => {
+      item.classList.add('experience-reveal-item');
+      item.style.setProperty('--reveal-order', index);
+    });
+    card.classList.add('experience-reveal-pending');
+    observer.observe(card);
+  });
+}
+</script></body></html>
