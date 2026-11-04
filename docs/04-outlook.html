@@ -14,7 +14,7 @@
     }
   }, {root: deck});
   const highlights = 'img, h2, .value-card, .future-direction > header, .direction-list > div, .career-vision, tbody tr, .closing-statement, .qa-art, .thank-you-english';
-  deck.querySelectorAll('.slide:first-child').forEach(slide => {
+  deck.querySelectorAll('.slide').forEach(slide => {
     slide.querySelectorAll(highlights).forEach((item, index) => {
       item.style.setProperty('--project-delay', Math.min(index, 6) * 65 + 'ms');
       item.classList.add('project-reveal', 'is-pending');

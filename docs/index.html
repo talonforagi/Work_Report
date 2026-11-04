@@ -80,6 +80,14 @@
   :is(#experience,#trial-review) .experience-reveal-item{transition:opacity .45s ease,transform .45s ease;transition-delay:calc(var(--reveal-order) * 90ms)}
   :is(#experience,#trial-review) .experience-reveal-pending .experience-reveal-item{opacity:0;transform:translateY(18px)}
 }
+@media(prefers-reduced-motion:no-preference){
+  .profile-reveal-ready .profile-slide{min-height:calc(100% + 180px);align-items:flex-start}
+  .profile-reveal-ready .profile-slide>.slide-inner{margin-block:0;position:sticky;top:20px}
+  .profile-reveal-ready .profile-details{transition:opacity .55s ease,transform .55s ease}
+  .profile-reveal-ready .profile-details :is(.facts>div,.profile-projects){transition:opacity .45s ease,transform .45s ease;transition-delay:calc(140ms + var(--reveal-order,0) * 85ms)}
+  .profile-reveal-ready:not(.profile-revealed) .profile-details,
+  .profile-reveal-ready:not(.profile-revealed) .profile-details :is(.facts>div,.profile-projects){opacity:0;transform:translateY(22px)}
+}
 </style></head><body data-page="0"><a class="skip-link" href="#profile">跳至正文</a><header class="topbar"><a class="brand" href="index.html" aria-label="返回个人信息介绍"><span class="brand-icon" aria-hidden="true"><i></i><i></i><i></i></span><span>转正汇报<small>PROBATION REVIEW / 2026</small></span></a><nav class="progress-nav" aria-label="答辩章节"><a href="index.html" data-chapter="0" aria-current="page"><small>01</small>个人信息介绍<i></i></a><a href="02-ai-exploration.html" data-chapter="1"><small>02</small>前期 AI 探索<i></i></a><a href="03-project-validation.html" data-chapter="2"><small>03</small>项目落地验证<i></i></a><a href="04-outlook.html" data-chapter="3"><small>04</small>未来工作展望<i></i></a><a href="05-summary-qa.html" data-chapter="4"><small>05</small>总结&QA<i></i></a></nav><span class="chapter-count"><strong>01</strong> / 05</span></header><main class="deck" id="main" tabindex="-1" aria-label="个人信息介绍纵向演示"><section id="profile" class="slide profile-slide" data-chapter="0" data-label="基本信息" aria-labelledby="profile-title"><div class="slide-inner"><div class="intro-kicker"><span class="eyebrow">01 / 个人信息介绍</span><span class="review-tag">2026 · 转正汇报答辩</span></div><div class="profile-hero"><div class="hero-name"><p class="micro">个人信息介绍</p><h1 id="profile-title">陈天元<span>CHEN TIANYUAN</span></h1><div class="role-row"><span>高级产品经理</span><span>P3-1</span></div></div><div class="profile-details"><span class="micro">PROFILE / 个人档案</span><dl class="facts"><div><dt>所属部门</dt><dd>桌面生态业务部</dd></div><div><dt>学历</dt><dd>硕士</dd></div><div><dt>入职时间</dt><dd class="date">2026.05.11</dd></div><div><dt>导师</dt><dd>刘晨曜</dd></div><div><dt>直属上级</dt><dd>关佐龙</dd></div></dl><div class="profile-projects"><span class="micro">试用期项目</span><div class="project-tags"><span><i>01</i>AI 锁屏游戏分发</span><span><i>02</i>OPC 应用复刻</span></div></div></div></div><a class="scroll-cue" href="#experience">向下滚动，了解过往经历 <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v15m-6-6 6 6 6-6"/></svg></a></div></section><section id="experience" class="slide experience-slide" data-chapter="0" data-label="过往经历与项目" aria-labelledby="experience-title"><div class="slide-inner"><div class="experience-lead"><p class="eyebrow">01 / 个人信息介绍</p><h2 id="experience-title">过往经历</h2><p class="profile-experience-summary">主导多个北美 AI 产品 <strong>0–1 落地</strong>，完成产品业务闭环</p></div><div class="case-grid">
 <article class="case-card panel"><h3>北美短剧分发平台</h3><p class="case-description">跑通素人内容分发业务，完成 AI 生成到商业转化闭环。</p><div class="metrics"><div><strong>1000+</strong><span>月活跃用户（MAU）</span></div><div><strong>100+</strong><span>人均月发布量</span></div><div><strong>$15</strong><span>平均单次发布变现</span></div></div><div class="case-highlight"><span class="highlight-icon">✦</span><p><b>Agent 7×24 小时社媒账号运营托管</b><br></p></div></article>
 <article class="case-card panel"><h3>企业 AI 中台</h3><p class="case-description">支撑跨境电商 GMV 增长与成本结构优化。</p><div class="metrics"><div><strong>-60%</strong><span>商品上新周期</span></div><div><strong>+18%</strong><span>订单数</span></div><div><strong>亿级</strong><span>间接赋能 GMV 增长</span></div></div><div class="case-highlight"><span class="highlight-icon">✦</span><p><b>市场 &amp; 供应链 Agent 全面覆盖</b><br></p></div></article>
@@ -101,4 +109,19 @@ if ('IntersectionObserver' in window && matchMedia('(prefers-reduced-motion:no-p
     observer.observe(card);
   });
 }
+</script><script>
+(() => {
+  if (!matchMedia('(prefers-reduced-motion:no-preference)').matches) return;
+  const deck = document.querySelector('.deck');
+  const items = deck.querySelectorAll('.profile-details .facts > div, .profile-details .profile-projects');
+  items.forEach((item, index) => item.style.setProperty('--reveal-order', index));
+  document.body.classList.add('profile-reveal-ready');
+  const reveal = () => {
+    if (deck.scrollTop < 32) return;
+    document.body.classList.add('profile-revealed');
+    deck.removeEventListener('scroll', reveal);
+  };
+  deck.addEventListener('scroll', reveal, {passive:true});
+  reveal();
+})();
 </script></body></html>
