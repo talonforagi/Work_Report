@@ -30,7 +30,7 @@
     }
   }, {root: deck, threshold: .12});
   const highlights = 'img, h2, h3, .exploration-thesis, .generation-statement, .game-code-highlights article, figcaption, .game-demo-copy p';
-  deck.querySelectorAll('.slide').forEach(slide => {
+  deck.querySelectorAll('.slide:first-child').forEach(slide => {
     slide.querySelectorAll(highlights).forEach((item, index) => {
       if (item.closest('.demo-card')) return;
       item.style.setProperty('--ai-delay', Math.min(index, 5) * 65 + 'ms');

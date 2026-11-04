@@ -75,15 +75,7 @@
 #experience .case-card .case-highlight{margin-top:auto}
 #experience .metrics strong .metric-direction{display:inline-block;font-family:Arial,sans-serif;font-size:.7em;font-weight:700;color:#c62828;vertical-align:.12em}
 
-@media(prefers-reduced-motion:no-preference){
-  .profile-reveal-ready .deck{scroll-snap-type:none}
-  .profile-reveal-ready .profile-slide{min-height:calc(100% + 180px);align-items:flex-start}
-  .profile-reveal-ready .profile-slide>.slide-inner{margin-block:0;position:sticky;top:20px}
-  .profile-reveal-ready .profile-details{transition:opacity .55s ease,transform .55s ease}
-  .profile-reveal-ready .profile-details :is(.facts>div,.profile-projects){transition:opacity .45s ease,transform .45s ease;transition-delay:calc(140ms + var(--reveal-order,0) * 85ms)}
-  .profile-reveal-ready:not(.profile-revealed) .profile-details,
-  .profile-reveal-ready:not(.profile-revealed) .profile-details :is(.facts>div,.profile-projects){opacity:0;transform:translateY(22px)}
-}
+
 @media(prefers-reduced-motion:no-preference){
   :is(#experience,#trial-review) .experience-reveal-item{transition:opacity .45s ease,transform .45s ease;transition-delay:calc(var(--reveal-order) * 90ms)}
   :is(#experience,#trial-review) .experience-reveal-pending .experience-reveal-item{opacity:0;transform:translateY(18px)}
@@ -92,20 +84,6 @@
 <article class="case-card panel"><h3>北美短剧分发平台</h3><p class="case-description">跑通素人内容分发业务，完成 AI 生成到商业转化闭环。</p><div class="metrics"><div><strong>1000+</strong><span>月活跃用户（MAU）</span></div><div><strong>100+</strong><span>人均月发布量</span></div><div><strong>$15</strong><span>平均单次发布变现</span></div></div><div class="case-highlight"><span class="highlight-icon">✦</span><p><b>Agent 7×24 小时社媒账号运营托管</b><br></p></div></article>
 <article class="case-card panel"><h3>企业 AI 中台</h3><p class="case-description">支撑跨境电商 GMV 增长与成本结构优化。</p><div class="metrics"><div><strong>-60%</strong><span>商品上新周期</span></div><div><strong>+18%</strong><span>订单数</span></div><div><strong>亿级</strong><span>间接赋能 GMV 增长</span></div></div><div class="case-highlight"><span class="highlight-icon">✦</span><p><b>市场 &amp; 供应链 Agent 全面覆盖</b><br></p></div></article>
 </div></div></section><section id="trial-review" class="slide trial-slide" data-chapter="0" data-label="试用期回顾" aria-labelledby="trial-review-title"><div class="slide-inner"><div class="experience-lead"><p class="eyebrow">01 / 个人信息介绍</p><h2 id="trial-review-title">试用期回顾</h2></div><div class="trial-timeline"><article class="trial-stage"><div class="trial-stage-head"><span>01</span><p>第 1 个月</p></div><ul><li>公司制度、企业背景培训</li><li>业务学习了解</li></ul></article><article class="trial-stage"><div class="trial-stage-head"><span>02</span><p>第 2–3 个月</p></div><ul><li>AI 方向探索脑爆</li><li>Demo 构建及初步验证</li></ul></article><article class="trial-stage"><div class="trial-stage-head"><span>03</span><p>第 4–6 个月</p></div><ul><li>AI 项目落地实践</li><li>跨部门沟通协作</li></ul></article></div></div></section></main><nav class="screen-dots" aria-label="本模块分屏导航"><a href="#profile" aria-label="第 1 屏：基本信息" title="基本信息" aria-current="true"><i></i></a><a href="#experience" aria-label="第 2 屏：过往经历与项目" title="过往经历与项目"><i></i></a><a href="#trial-review" aria-label="第 3 屏：试用期回顾" title="试用期回顾"><i></i></a></nav><footer class="presentation-controls"><div class="current-screen"><strong>01</strong><span>/ 03</span><i></i><span class="screen-label">基本信息</span></div><nav class="module-navigation" aria-label="切换模块"><span class="module-start">个人信息介绍</span><span class="module-divider"></span><a class="module-link next-module" href="02-ai-exploration.html">前期 AI 探索<span>→</span></a></nav><div class="control-actions"><span class="keyboard-tip">↑ ↓ 屏内翻页</span><button class="fullscreen-button" aria-label="全屏演示" title="全屏演示（F）">⛶</button><button class="previous-screen" aria-label="上一屏" title="上一屏（↑）" disabled>↑</button><button class="next-screen" aria-label="下一屏" title="下一屏（↓）" >↓</button></div></footer><div class="toast" role="status"></div><script src="assets/image-preview.js" defer></script><script>
-(() => {
-  const deck = document.querySelector('.deck');
-  const items = document.querySelectorAll('.profile-details .facts > div, .profile-details .profile-projects');
-  items.forEach((item, index) => item.style.setProperty('--reveal-order', index));
-  document.body.classList.add('profile-reveal-ready');
-  const reveal = () => {
-    if (deck.scrollTop < 32) return;
-    document.body.classList.add('profile-revealed');
-    deck.removeEventListener('scroll', reveal);
-  };
-  deck.addEventListener('scroll', reveal, { passive: true });
-  reveal();
-})();
-</script><script>
 if ('IntersectionObserver' in window && matchMedia('(prefers-reduced-motion:no-preference)').matches) {
   const observer = new IntersectionObserver(entries => {
     for (const entry of entries) {

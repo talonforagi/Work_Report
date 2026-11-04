@@ -47,7 +47,7 @@
     '.replica-case > header', '.flow-step', '.launch-qa-list > article',
     '.glocal-block > header > p'
   ].join(',');
-  deck.querySelectorAll('.slide').forEach(slide => {
+  deck.querySelectorAll('.slide:first-child').forEach(slide => {
     slide.querySelectorAll(highlights).forEach((item, index) => {
       item.style.setProperty('--project-delay', Math.min(index, 6) * 65 + 'ms');
       item.classList.add('project-reveal', 'is-pending');
